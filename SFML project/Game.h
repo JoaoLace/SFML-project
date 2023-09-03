@@ -1,6 +1,7 @@
 #pragma once
 
-
+#include <iostream>
+#include <cstdlib>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -18,11 +19,17 @@ private:
 	sf::RenderWindow* window;
 	sf::Event ev;
 
+	// Game objs
+	sf::RectangleShape enemy;
+
 	// private funcs
+	
 	void initVariable();
 	void initWindow();
+	void initEnemy();
 
 public:
+	bool mouseOnEnemy();
 	// Constructors and Destructors
 	Game();
 	virtual ~Game();
