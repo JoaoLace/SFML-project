@@ -13,10 +13,28 @@ bool Game::mouseOnEnemy()
 	return false;
 }
 
+void Game::getMousePosition()
+{
+	/*
+		@ return void
+
+		Updates the mouse positions
+			-mousePosWindow relative to window (Vector2i -> 2 int (x and y) )
+	*/
+
+	this->mousePosWindow = sf::Mouse::getPosition(*window);
+}
+
 // Private funcs
 void Game::initVariable()
 {
 	this->window = nullptr;
+	
+	// Enemy game logic
+	this->points = 0;
+	this->enemySpawnTimerMax = 1000.f;
+	this->enemySpawnTimer = this->enemySpawnTimerMax;
+	this->maxEnemies = 3;
 }
 
 void Game::initWindow()
@@ -24,7 +42,7 @@ void Game::initWindow()
 	this->videoMode.height = 480;
 	this->videoMode.width = 600;
 	this->window = new sf::RenderWindow(this->videoMode, "My game!", sf::Style::Titlebar | sf::Style::Close);
-	this->window->setFramerateLimit(30);
+	this->window->setFramerateLimit(60);
 }
 
 void Game::initEnemy()
@@ -94,9 +112,10 @@ void Game::update()
 	*/
 
 	this->pollEvents();
-
+	this->getMousePosition();
+	this->updateEnemies();
 	// Display mouse position (relative to the window)
-	std::cout << "Mouse pos: " << sf::Mouse::getPosition(*window).x << " " << sf::Mouse::getPosition(*window).y << "\n";
+	std::cout << "Mouse pos: " << mousePosWindow.x << " " << mousePosWindow.y << "\n";
 }
 
 void Game::render()
@@ -110,11 +129,67 @@ void Game::render()
 
 	*/
 
-	window->clear();
+	this->window->clear();
 	
 	// Draw game
 
-	window->draw(enemy);
+	this->renderEnemies();
 
-	window->display();
+	this->window->display();
+}
+
+void Game::updateEnemies() 
+{
+	/*
+		@return void
+
+		Updates de enemy spaw timer and spaws enemes
+		when the total amount of enemies is less than max amount
+		Moves the enemies down
+		Removes the enemies at the edge of the screen TODO
+	*/
+
+	if (this->enemies.size() < this->maxEnemies)
+	{
+		if (this->enemySpawnTimer >= this->enemySpawnTimerMax)
+		{
+			this->spawnEnemies();
+			this->enemySpawnTimer = 0.f;
+		}
+		else
+			this->enemySpawnTimer += 1.f;
+	}
+
+	for (auto& e : enemies) {
+		e.move(0.f, 1.f);
+	}
+}
+
+void Game::renderEnemies()
+{
+
+	// Render all enemies
+	for (auto& e : enemies) {
+		window->draw(e);
+	}
+}
+
+void Game::spawnEnemies()
+{
+	/*
+		@return void
+
+		Spawns enemies and sets their colors and positions
+			-Sets a randow position
+			-Sets a randow color
+			-Adds enemies to the vector
+	*/
+
+	this->enemy.setPosition(
+		static_cast <float>(rand() % static_cast<int>(window->getSize().x - enemy.getSize().x)),
+		0.f
+	);
+
+	this->enemy.setFillColor(sf::Color::Green);
+	this->enemies.push_back(enemy);
 }
