@@ -1,10 +1,11 @@
 #include "Game.h"
 int randPosX;
 int randPosY;
+int enemtPosY;
+int enemyPosX;
+bool killEnemy;
 bool Game::mouseOnEnemy()
 {
-	int enemyPosX = enemy.getPosition().x;
-	int enemtPosY = enemy.getPosition().y;
 	
 	if (sf::Mouse::getPosition(*window).x > enemyPosX and sf::Mouse::getPosition(*window).x < enemyPosX + 50) {
 		if (sf::Mouse::getPosition(*window).y > enemtPosY and sf::Mouse::getPosition(*window).y < enemtPosY + 50)
@@ -28,8 +29,9 @@ void Game::getMousePosition()
 // Private funcs
 void Game::initVariable()
 {
+
 	this->window = nullptr;
-	
+	this->score = 0;
 	// Enemy game logic
 	this->points = 0;
 	this->enemySpawnTimerMax = 1000.f;
@@ -88,6 +90,12 @@ void Game::pollEvents()
 		case sf::Event::KeyPressed:
 			if (ev.key.code == sf::Keyboard::Escape)
 				window->close();
+			if (ev.key.code == sf::Keyboard::A and mouseOnEnemy())
+				killEnemy = true;
+			break;
+		case sf::Event::MouseButtonPressed:
+			if (ev.key.code == sf::Keyboard::A and mouseOnEnemy())
+				killEnemy = true;
 			break;
 		default:
 			break;
@@ -115,7 +123,7 @@ void Game::update()
 	this->getMousePosition();
 	this->updateEnemies();
 	// Display mouse position (relative to the window)
-	std::cout << "Mouse pos: " << mousePosWindow.x << " " << mousePosWindow.y << "\n";
+	
 }
 
 void Game::render()
@@ -157,7 +165,7 @@ void Game::updateEnemies()
 			this->enemySpawnTimer = 0.f;
 		}
 		else
-			this->enemySpawnTimer += 1.f;
+			this->enemySpawnTimer += 5.f;
 	}
 
 	for (auto& e : enemies) {
@@ -167,15 +175,24 @@ void Game::updateEnemies()
 
 void Game::renderEnemies()
 {
-
+	
 	// Render all enemies
 	for (auto& e : enemies) {
 		window->draw(e);
+		enemyPosX = e.getPosition().x;
+		enemtPosY = e.getPosition().y;
+		mouseOnEnemy();
+		if (killEnemy) {
+			e.setFillColor(sf::Color::Transparent);
+			e.setOutlineThickness(0.f);
+			score += 1;
+		}
 	}
 }
 
 void Game::spawnEnemies()
 {
+	killEnemy = false;
 	/*
 		@return void
 

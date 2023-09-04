@@ -26,6 +26,7 @@ private:
 
 	// Game logic
 	int points;
+
 	float enemySpawnTimer;
 	float enemySpawnTimerMax;
 	int maxEnemies;
@@ -48,6 +49,7 @@ public:
 
 	// Accessors
 	const bool running() const;
+	int score;
 
 	// Funcs
 	void spawnEnemies();

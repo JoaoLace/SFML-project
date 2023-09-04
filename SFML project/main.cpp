@@ -19,7 +19,8 @@ int main() {
 		game.render();
 		
 	}
-
+	game.score > 3 ? game.score = 3 : game.score = 0;
+	std::cout << "YOU SCORED " << game.score << "!";
 	// End
 
 	return 0;
