@@ -23,6 +23,7 @@ private:
 
 	// mouse pos
 	sf::Vector2i mousePosWindow;
+	sf::Vector2f mousePosView;
 
 	// Game logic
 	int points;
@@ -42,16 +43,15 @@ private:
 	void initEnemy();
 
 public:
-	bool mouseOnEnemy();
 	// Constructors and Destructors
 	Game();
 	virtual ~Game();
 
 	// Accessors
 	const bool running() const;
-	int score;
 
 	// Funcs
+	void showPoints();
 	void spawnEnemies();
 	void updateEnemies();
 	void renderEnemies();

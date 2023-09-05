@@ -3,15 +3,10 @@ int randPosX;
 int randPosY;
 int enemtPosY;
 int enemyPosX;
-bool killEnemy;
-bool Game::mouseOnEnemy()
+
+void Game::showPoints()
 {
-	
-	if (sf::Mouse::getPosition(*window).x > enemyPosX and sf::Mouse::getPosition(*window).x < enemyPosX + 50) {
-		if (sf::Mouse::getPosition(*window).y > enemtPosY and sf::Mouse::getPosition(*window).y < enemtPosY + 50)
-			return true;
-	}
-	return false;
+	std::cout << "SCORE -> " << points;
 }
 
 void Game::getMousePosition()
@@ -24,6 +19,7 @@ void Game::getMousePosition()
 	*/
 
 	this->mousePosWindow = sf::Mouse::getPosition(*window);
+	this->mousePosView = this->window->mapPixelToCoords(this->mousePosWindow);
 }
 
 // Private funcs
@@ -31,10 +27,9 @@ void Game::initVariable()
 {
 
 	this->window = nullptr;
-	this->score = 0;
 	// Enemy game logic
 	this->points = 0;
-	this->enemySpawnTimerMax = 1000.f;
+	this->enemySpawnTimerMax = 10.f;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
 	this->maxEnemies = 3;
 }
@@ -90,12 +85,6 @@ void Game::pollEvents()
 		case sf::Event::KeyPressed:
 			if (ev.key.code == sf::Keyboard::Escape)
 				window->close();
-			if (ev.key.code == sf::Keyboard::A and mouseOnEnemy())
-				killEnemy = true;
-			break;
-		case sf::Event::MouseButtonPressed:
-			if (ev.key.code == sf::Keyboard::A and mouseOnEnemy())
-				killEnemy = true;
 			break;
 		default:
 			break;
@@ -148,6 +137,8 @@ void Game::render()
 
 void Game::updateEnemies() 
 {
+
+	
 	/*
 		@return void
 
@@ -165,12 +156,29 @@ void Game::updateEnemies()
 			this->enemySpawnTimer = 0.f;
 		}
 		else
-			this->enemySpawnTimer += 5.f;
+			this->enemySpawnTimer += 1.f;
 	}
 
-	for (auto& e : enemies) {
-		e.move(0.f, 1.f);
-	}
+	for (int i = 0; i < enemies.size(); i++) {
+		bool deleted = false;
+		enemies[i].move(0.f, 1.f);
+
+		// check if clicked upon
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			if (enemies[i].getGlobalBounds().contains(mousePosView)) {
+				deleted = true;
+				points += 10.f;
+			}
+		}
+
+		if (enemies[i].getPosition().y > window->getSize().y) {
+				deleted = true;
+		}
+
+		if (deleted) {
+			enemies.erase(enemies.begin() + i);
+		}
+		}
 }
 
 void Game::renderEnemies()
@@ -179,20 +187,12 @@ void Game::renderEnemies()
 	// Render all enemies
 	for (auto& e : enemies) {
 		window->draw(e);
-		enemyPosX = e.getPosition().x;
-		enemtPosY = e.getPosition().y;
-		mouseOnEnemy();
-		if (killEnemy) {
-			e.setFillColor(sf::Color::Transparent);
-			e.setOutlineThickness(0.f);
-			score += 1;
-		}
 	}
 }
 
 void Game::spawnEnemies()
 {
-	killEnemy = false;
+
 	/*
 		@return void
 
