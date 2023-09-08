@@ -6,6 +6,7 @@ int enemyPosX;
 
 void Game::showPoints()
 {
+	std::cout << "GAME OVER" << "\n";
 	std::cout << "SCORE -> " << points;
 }
 
@@ -28,6 +29,8 @@ void Game::initVariable()
 
 	this->window = nullptr;
 	// Enemy game logic
+	mouseHeld = false;
+	this->playerLife = 5;
 	this->points = 0;
 	this->enemySpawnTimerMax = 10.f;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
@@ -39,7 +42,7 @@ void Game::initWindow()
 	this->videoMode.height = 480;
 	this->videoMode.width = 600;
 	this->window = new sf::RenderWindow(this->videoMode, "My game!", sf::Style::Titlebar | sf::Style::Close);
-	this->window->setFramerateLimit(60);
+	//this->window->setFramerateLimit(60);
 }
 
 void Game::initEnemy()
@@ -110,7 +113,8 @@ void Game::update()
 
 	this->pollEvents();
 	this->getMousePosition();
-	this->updateEnemies();
+	//this->updateEnemies();
+
 	// Display mouse position (relative to the window)
 	
 }
@@ -163,22 +167,35 @@ void Game::updateEnemies()
 		bool deleted = false;
 		enemies[i].move(0.f, 1.f);
 
-		// check if clicked upon
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-			if (enemies[i].getGlobalBounds().contains(mousePosView)) {
-				deleted = true;
-				points += 10.f;
-			}
-		}
-
-		if (enemies[i].getPosition().y > window->getSize().y) {
-				deleted = true;
-		}
-
-		if (deleted) {
+		if (enemies[i].getPosition().y > window->getSize().y) 
 			enemies.erase(enemies.begin() + i);
 		}
+
+	// check if clicked upon
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	{
+		if (mouseHeld == false)
+		{
+			mouseHeld = true;
+			bool deleted = false;
+			for (size_t i = 0; i < enemies.size() && deleted == false; i++) {
+				if (enemies[i].getGlobalBounds().contains(mousePosView))
+				{
+					// Delete enemy
+					deleted = true;
+					enemies.erase(enemies.begin() + i);
+
+					points += 10;
+				}
+			}
 		}
+	}
+		else 
+		{
+			mouseHeld = false;
+		}
+	
+
 }
 
 void Game::renderEnemies()
@@ -210,3 +227,19 @@ void Game::spawnEnemies()
 	this->enemy.setFillColor(sf::Color::Green);
 	this->enemies.push_back(enemy);
 }
+void Game::EnemieDmg()
+{
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		if (enemies[i].getPosition().y == window->getSize().y)
+		{
+			playerLife--;
+		}
+		if (playerLife == 0) {
+			window->close();
+		}
+	}
+}
+
+
+
