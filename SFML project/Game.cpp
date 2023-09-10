@@ -73,9 +73,11 @@ void Game::initEnemy()
 	
 	enemy.setPosition(250, 350);
 	// float
+	/*
 	enemy.setSize(sf::Vector2f(50.f,50.f));
 	enemy.setFillColor(sf::Color::Blue);
 	enemy.setOutlineColor(sf::Color::Cyan);
+	*/
 	enemy.setOutlineThickness(1.f);
 
 }
@@ -233,8 +235,26 @@ void Game::updateEnemies()
 					deleted = true;
 					enemies.erase(enemies.begin() + i);
 
-					points += 10;
-					text1.setString(std::to_string(points));
+					if (enemies[i].getFillColor() == sf::Color::Blue)
+					{
+						points += 50;
+					}
+					else if (enemies[i].getFillColor() == sf::Color::Yellow)
+					{
+						points += 40;
+					}
+					else if (enemies[i].getFillColor() == sf::Color::Red)
+					{
+						points += 30;
+					}
+					else if (enemies[i].getFillColor() == sf::Color::Magenta)
+					{
+						points += 20;
+					}
+					else
+					{
+						points += 10;
+					}
 				}
 			}
 		}
@@ -273,7 +293,36 @@ void Game::spawnEnemies()
 		0.f
 	);
 
-	this->enemy.setFillColor(sf::Color::Green);
+	// rand enemy
+	int enemyType = (rand() % 5) + 1;
+	
+	switch (enemyType)
+	{
+	case 1:
+		enemy.setSize(sf::Vector2f(15.f,15.f));
+		enemy.setFillColor(sf::Color::Blue);
+		break;
+	case 2:
+		enemy.setSize(sf::Vector2f(50.f, 50.f));
+		enemy.setFillColor(sf::Color::Red);
+		break;
+	case 3:
+		enemy.setSize(sf::Vector2f(75.f, 75.f));
+		enemy.setFillColor(sf::Color::Magenta);
+		break;
+	case 4:
+		enemy.setSize(sf::Vector2f(30.f, 30.f)); 
+		enemy.setFillColor(sf::Color::Yellow);
+		break;
+	case 5:
+		enemy.setSize(sf::Vector2f(100.f, 100.f));
+		enemy.setFillColor(sf::Color::Cyan);
+		break;
+	
+	default:
+		break;
+	}
+
 	this->enemies.push_back(enemy);
 }
 
