@@ -12,9 +12,8 @@ int main() {
 	float lastTime = 0;
 
 	// Game loop
-	while (game.running()) {
+	while (game.running() and !game.getEndGame()) {
 
-		// Update
 		game.update();
 
 		fps.update();
@@ -22,7 +21,7 @@ int main() {
 		ss << fps.getFPS();
 
 		std::cout << "FPS: " << ss.str() << "\n";
-		// Render
+		
 		game.render();
 		
 	}

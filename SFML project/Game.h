@@ -26,9 +26,10 @@ private:
 	sf::Vector2f mousePosView;
 
 	// Game logic
+	bool endGame;
 	bool mouseHeld;
 	unsigned points;
-	int playerLife;
+	int health;
 	float enemySpawnTimer;
 	float enemySpawnTimerMax;
 	int maxEnemies;
@@ -50,17 +51,34 @@ public:
 
 	// Accessors
 	const bool running() const;
+	const bool getEndGame() const;
+
+	// Fonts
+	sf::Font font;
+	sf::Text text1;
+	sf::Text text2;
+	sf::Text text3;
+	sf::Text text4;
+
 
 	// Funcs
-	void EnemieDmg();
+	void initText();
+	
+	void initFont();
 	void showPoints();
 	void spawnEnemies();
-	void updateEnemies();
-	void renderEnemies();
+	
+	
 	void pollEvents();
 	void getMousePosition();
+	
 	void update();
+	void updateText();
+	void updateEnemies();
+
 	void render();
+	void renderEnemies(sf::RenderTarget& target);
+	void renderText(sf::RenderTarget& target);
 };
 class FPS
 {

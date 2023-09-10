@@ -4,6 +4,13 @@ int randPosY;
 int enemtPosY;
 int enemyPosX;
 
+void Game::updateText()
+{
+	std::stringstream ss;
+	ss << "Points: " << points << "\nLife: " << health;
+	text1.setString(ss.str());
+}
+
 void Game::showPoints()
 {
 	std::cout << "GAME OVER" << "\n";
@@ -29,8 +36,9 @@ void Game::initVariable()
 
 	this->window = nullptr;
 	// Enemy game logic
-	mouseHeld = false;
-	this->playerLife = 5;
+	this->endGame = false;
+	this->mouseHeld = false;
+	this->health = 10;
 	this->points = 0;
 	this->enemySpawnTimerMax = 10.f;
 	this->enemySpawnTimer = this->enemySpawnTimerMax;
@@ -42,9 +50,24 @@ void Game::initWindow()
 	this->videoMode.height = 480;
 	this->videoMode.width = 600;
 	this->window = new sf::RenderWindow(this->videoMode, "My game!", sf::Style::Titlebar | sf::Style::Close);
-	//this->window->setFramerateLimit(60);
+	this->window->setFramerateLimit(60);
 }
+void Game::initFont()
+{
+	font.loadFromFile("Gerlick.otf");
 
+}
+void Game::initText()
+{
+	text1.setFont(font);
+	text1.setCharacterSize(24);
+	text1.setPosition(0.f, 0.f);
+
+	text2.setFont(font);
+	text2.setCharacterSize(24);
+	text2.setPosition(0.f, 30.f);
+	
+}
 void Game::initEnemy()
 {
 	
@@ -61,6 +84,8 @@ void Game::initEnemy()
 Game::Game()
 {
 	this->initVariable();
+	this->initFont();
+	this->initText();
 	this->initWindow();
 	this->initEnemy();
 }
@@ -112,13 +137,28 @@ void Game::update()
 	*/
 
 	this->pollEvents();
-	this->getMousePosition();
-	//this->updateEnemies();
 
-	// Display mouse position (relative to the window)
+
+	if (!endGame)
+		{
+		// Display mouse position (relative to the window)
+		this->getMousePosition();
+		
+		this->updateEnemies();
+		
+		this->updateText();
+		}
 	
+	
+	if (health <= 0)
+	{
+		endGame = true;
+	}
 }
-
+void Game::renderText(sf::RenderTarget& target)
+{
+	target.draw(text1);
+}
 void Game::render()
 {
 	/*
@@ -134,7 +174,10 @@ void Game::render()
 	
 	// Draw game
 
-	this->renderEnemies();
+
+	this->renderEnemies(*window);
+
+	this->renderText(*window);
 
 	this->window->display();
 }
@@ -165,10 +208,15 @@ void Game::updateEnemies()
 
 	for (int i = 0; i < enemies.size(); i++) {
 		bool deleted = false;
-		enemies[i].move(0.f, 1.f);
+		enemies[i].move(0.f, 2.f);
 
-		if (enemies[i].getPosition().y > window->getSize().y) 
+		if (enemies[i].getPosition().y > window->getSize().y)
+		{
 			enemies.erase(enemies.begin() + i);
+			health--;
+			text4.setString(std::to_string(health));
+		}
+			
 		}
 
 	// check if clicked upon
@@ -186,24 +234,25 @@ void Game::updateEnemies()
 					enemies.erase(enemies.begin() + i);
 
 					points += 10;
+					text1.setString(std::to_string(points));
 				}
 			}
 		}
 	}
-		else 
-		{
-			mouseHeld = false;
-		}
+	else 
+	{
+		mouseHeld = false;
+	}
 	
 
 }
 
-void Game::renderEnemies()
+void Game::renderEnemies(sf::RenderTarget& target)
 {
 	
 	// Render all enemies
 	for (auto& e : enemies) {
-		window->draw(e);
+		target.draw(e);
 	}
 }
 
@@ -227,19 +276,10 @@ void Game::spawnEnemies()
 	this->enemy.setFillColor(sf::Color::Green);
 	this->enemies.push_back(enemy);
 }
-void Game::EnemieDmg()
-{
-	for (int i = 0; i < enemies.size(); i++)
-	{
-		if (enemies[i].getPosition().y == window->getSize().y)
-		{
-			playerLife--;
-		}
-		if (playerLife == 0) {
-			window->close();
-		}
-	}
-}
 
+const bool Game::getEndGame() const
+{
+	return this->endGame;
+}
 
 
